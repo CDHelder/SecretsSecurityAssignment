@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -21,9 +22,24 @@ namespace SecretsSecurityAssignment.Service
 
         public string GenerateJWT(List<Claim> claims)
         {
-            //var key = new SymmetricSecurityKey
-            //TODO: Maak deze (tip check LesSnippets)
-            return string.Empty;
+            //TODO: Get userId value
+            //var userId = claims.UserId ??
+
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Pak hier de value van securitykey in userid"));
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Expires = DateTime.UtcNow.AddDays(1),
+                Issuer = "traktor.nl",
+                Audience = "aud",
+                Subject = new ClaimsIdentity(claims),
+                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            
+            return tokenHandler.WriteToken(token);
         }
 
         public string GenerateSalt()
