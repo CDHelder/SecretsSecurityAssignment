@@ -10,9 +10,11 @@ namespace SecretsSecurityAssignment.Service.Interfaces
 {
     public interface ITopSecretService
     {
-        public Result<TopSecret> GetTopSecret(int id);
-        public Result<List<TopSecret>> GetAllTopSecrets();
-        public Result CreateTopSecret(TopSecret topSecret);
-        public Result DeleteTopSecret(int topSecretId);
+        public Result<TopSecret> Get(int id);
+        public Result<List<TopSecret>> GetAll();
+        public Result Create(string content, string name);
+        public Result Delete(int topSecretId);
+        public Result Update(TopSecret secret);
+
     }
 }

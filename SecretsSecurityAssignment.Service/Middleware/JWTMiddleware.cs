@@ -21,7 +21,7 @@ namespace SecretsSecurityAssignment.Service.Middleware
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context, IUnitOfWork unitOfWork)
+        public async Task Invoke(HttpContext context, IJWTService jWTService)
         {
             //TODO: Middleware dependecy injection c#
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -32,24 +32,16 @@ namespace SecretsSecurityAssignment.Service.Middleware
             }
             else
             {
-                await AttachUserToContext(context, token, unitOfWork);
+                await AttachUserToContext(context, token, jWTService);
                 await next(context);
             }
         }
 
-        public async Task AttachUserToContext(HttpContext context, string token, IUnitOfWork unitOfWork)
+        public async Task AttachUserToContext(HttpContext context, string token , IJWTService jWTService)
         {
             try
             {
-                //var userSecurityKey = "dsfgsdfg";
-                
-                //TODO: get de userId en daarmee de related userSecurityKey
-                //Token decrypten in de claims list de claim met type SerialNumber pakken ??
-
-                var userId = Int32.Parse(context.User.Claims.Where(a => a.Type == ClaimTypes.SerialNumber).FirstOrDefault().Value);
-                var userSecurityKey = unitOfWork.UserRepository.GetById(userId).SecurityKey;
-
-                var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(userSecurityKey));
+                var securityKey = jWTService.CreateSymmetricSecurityKey(token);
 
                 var tokenHandler = new JwtSecurityTokenHandler();
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
@@ -67,7 +59,7 @@ namespace SecretsSecurityAssignment.Service.Middleware
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim("UserId", jwtToken.Claims.FirstOrDefault(x => x.Type == "UserId").Value),
+                        new Claim(ClaimTypes.SerialNumber, jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.SerialNumber).Value),
                         new Claim(ClaimTypes.Name, jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value),
                         new Claim(ClaimTypes.Role, jwtToken.Claims.First(x => x.Type == ClaimTypes.Role).Value)
                     };

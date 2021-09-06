@@ -10,9 +10,11 @@ namespace SecretsSecurityAssignment.Service.Interfaces
 {
     public interface IStateSecretService
     {
-        public Result<StateSecret> GetStateSecret(int id);
-        public Result<List<StateSecret>> GetAllStateSecrets();
-        public Result CreateStateSecret(StateSecret stateSecret);
-        public Result DeleteStateSecret(int stateSecretId);
+        public Result<StateSecret> Get(int id);
+        public Result<List<StateSecret>> GetAll();
+        public Result Create(string content, string name);
+        public Result Delete(int stateSecretId);
+        public Result Update(StateSecret secret);
+
     }
 }

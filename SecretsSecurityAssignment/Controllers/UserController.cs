@@ -11,8 +11,6 @@ namespace SecretsSecurityAssignment.WebApi.Controllers
     {
         private readonly IUserService userService;
 
-        //TODO: Maak UserController
-
         public UserController(IUserService userService)
         {
             this.userService = userService;
@@ -45,7 +43,6 @@ namespace SecretsSecurityAssignment.WebApi.Controllers
         {
             //TODO: ?? Captcha toevoegen 
             //TODO: ?? Niet teveel requests per ip address ~ tip: return StatusCode(429);
-
             try
             {
                 var result = userService.Register(createCredentials.Username, createCredentials.Password, createCredentials.UserType);
@@ -64,17 +61,87 @@ namespace SecretsSecurityAssignment.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("Block")]
-        public IActionResult BlockUser(string username = null, int id = 0)
+        [Route("Block/{id}")]
+        public IActionResult BlockUser(int id)
         {
-            return Ok();
+            try
+            {
+                var result = userService.Block(id);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                return Ok($"Blocking user with id: {id} was {result.IsSuccess}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
-        [Route("Unblock")]
-        public IActionResult UnblockUser(string username = null, int id = 0)
+        [Route("Block/{username}")]
+        public IActionResult BlockUser(string username)
         {
-            return Ok();
+            try
+            {
+                var result = userService.Block(username);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                return Ok($"Blocking user with username: {username} was {result.IsSuccess}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("Unblock/{id}")]
+        public IActionResult UnblockUser(int id)
+        {
+            try
+            {
+                var result = userService.Unblock(id);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                return Ok($"Unblocking user with id: {id} was {result.IsSuccess}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("Unblock/{username}")]
+        public IActionResult UnblockUser(string username)
+        {
+            try
+            {
+                var result = userService.Unblock(username);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                return Ok($"Unblocking user with username: {username} was {result.IsSuccess}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using SecretsSecurityAssignment.Core.Data.Service;
+using SecretsSecurityAssignment.Core.UserEntities;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,6 +15,17 @@ namespace SecretsSecurityAssignment.Service
 {
     public class JWTService : IJWTService
     {
+        private readonly IUnitOfWork unitOfWork;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private JwtSecurityTokenHandler tokenHandler;
+
+        public JWTService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
+        {
+            this.unitOfWork = unitOfWork;
+            this.httpContextAccessor = httpContextAccessor;
+            tokenHandler = new();
+        }
+
         public string ComputeHash(string password, string salt)
         {
             var bytePassword = Encoding.ASCII.GetBytes(password);
@@ -34,7 +47,6 @@ namespace SecretsSecurityAssignment.Service
                 SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             
             return tokenHandler.WriteToken(token);
@@ -46,6 +58,62 @@ namespace SecretsSecurityAssignment.Service
             var rng = new RNGCryptoServiceProvider();
             rng.GetBytes(bytes);
             return Convert.ToBase64String(bytes);
+        }
+
+        public string GetSecurityKeyFromTokenInHttpContext()
+        {
+            var token = httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+            var userSecurityKey = unitOfWork.UserRepository.GetById(userId).SecurityKey;
+
+            return userSecurityKey;
+        }
+
+        public int GetUserIdFromTokenInHttpContext()
+        {
+            var token = httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+
+            return userId;
+        }
+
+        public int GetUserIdFromTokenInHttpContext(HttpContext context)
+        {
+            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+
+            return userId;
+        }
+
+        public string GetUserTypeFromTokenInHttpContext(HttpContext context)
+        {
+            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+
+            var userRole = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role).Value;
+
+            return userRole;
+        }
+
+        public SymmetricSecurityKey CreateSymmetricSecurityKey(string token)
+        {
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+            var userSecurityKey = unitOfWork.UserRepository.GetById(userId).SecurityKey;
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(userSecurityKey));
+
+            return securityKey;
         }
     }
 }

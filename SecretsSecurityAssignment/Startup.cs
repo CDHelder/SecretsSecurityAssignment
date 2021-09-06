@@ -35,6 +35,10 @@ namespace SecretsSecurityAssignment
 
             services.ConfigureAllDependecyInjections();
 
+            services.AddAutoMapper(typeof(Startup));
+
+            services.AddHttpContextAccessor();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -59,7 +63,7 @@ namespace SecretsSecurityAssignment
 
             //TODO: ?? EXTRA: Check voor securityKey per sessie ipv per user (per sessie) 
             //app.UseAuthorization();
-            app.UseMiddleware<JWTMiddleware>();
+            //app.UseMiddleware<JWTMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

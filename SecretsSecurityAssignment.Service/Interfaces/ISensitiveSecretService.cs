@@ -10,9 +10,10 @@ namespace SecretsSecurityAssignment.Service.Interfaces
 {
     public interface ISensitiveSecretService
     {
-        public Result<SensitiveSecret> GetSensitiveSecret(int id);
-        public Result<List<SensitiveSecret>> GetAllSensitiveSecrets();
-        public Result CreateSensitiveSecret(SensitiveSecret sensitiveSecret);
-        public Result DeleteSensitiveSecret(int sensitiveSecretId);
+        public Result<SensitiveSecret> Get(int id);
+        public Result<List<SensitiveSecret>> GetAll();
+        public Result Create(string content, string name);
+        public Result Delete(int sensitiveSecretId);
+        public Result Update(SensitiveSecret secret);
     }
 }

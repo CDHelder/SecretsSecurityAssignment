@@ -2,6 +2,7 @@
 using SecretsSecurityAssignment.Core.Data.Service;
 using SecretsSecurityAssignment.Data.Service;
 using SecretsSecurityAssignment.Service;
+using SecretsSecurityAssignment.Service.CustomAttributes;
 using SecretsSecurityAssignment.Service.Interfaces;
 
 namespace SecretsSecurityAssignment.WebApi.ServiceCollectionExtentions
@@ -19,6 +20,8 @@ namespace SecretsSecurityAssignment.WebApi.ServiceCollectionExtentions
             services.AddScoped<ISensitiveSecretService, SensitiveSecretService>();
             services.AddScoped<IStateSecretService, StateSecretService>();
             services.AddScoped<ITopSecretService, TopSecretService>();
+
+            //services.AddScoped<IAuthorizeCore, AuthorizeCore>();
 
             return services;
         }

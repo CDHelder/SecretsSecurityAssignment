@@ -9,7 +9,9 @@ namespace SecretsSecurityAssignment.Service
         public Result Register(string username, string password, UserType userType);
         public Result Block(int userId);
         public Result Block(int[] userIds);
+        public Result Block(string username);
         public Result Unblock(int userId);
+        public Result Unblock(string username);
         public Result Unblock(int[] userIds);
     }
 }

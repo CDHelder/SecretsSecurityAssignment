@@ -198,5 +198,41 @@ namespace SecretsSecurityAssignment.Service
 
             return Result.Success();
         }
+
+        public Result Block(string username)
+        {
+            var user = unitOfWork.UserRepository.Get(filter: u => u.UserName == username);
+
+            if (user == null)
+                return Result.Failure($"Couldn't find user with username: {username}");
+
+            user.Blocked = true;
+            unitOfWork.UserRepository.Update(user);
+
+            if (unitOfWork.SaveChanges(1) == false)
+            {
+                return Result.Failure($"Couldn't save data for user: {user.UserName} of type: {user.UserType}");
+            }
+
+            return Result.Success();
+        }
+
+        public Result Unblock(string username)
+        {
+            var user = unitOfWork.UserRepository.Get(filter: u => u.UserName == username);
+
+            if (user == null)
+                return Result.Failure($"Couldn't find user with username: {username}");
+
+            user.Blocked = false;
+            unitOfWork.UserRepository.Update(user);
+
+            if (unitOfWork.SaveChanges(1) == false)
+            {
+                return Result.Failure($"Couldn't save data for user: {user.UserName} of type: {user.UserType}");
+            }
+
+            return Result.Success();
+        }
     }
 }
