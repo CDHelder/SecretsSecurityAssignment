@@ -67,38 +67,57 @@ namespace SecretsSecurityAssignment.Service
 
         public Result<string> Login(string username, string password)
         {
-            var user = unitOfWork.UserRepository.Get(filter: u => u.UserName == username);
-
-            if (user == null)
-                return Result.Failure<string>($"Couldn't find a user with username: {username}");
-            else if (user.Blocked == true)
-                return Result.Failure<string>($"User is not allowed to login");
-            else if (user.HashedPassword != jWTService.ComputeHash(password, user.Salt))
-                return Result.Failure<string>($"{password} is the incorrect password");
+            var validateResult = ValidateLogin(username, password);
+            if (validateResult.IsFailure)
+            {
+                return Result.Failure<string>(validateResult.Error);
+            }
 
             var jwt = jWTService.GenerateJWT(new List<Claim>
             {
-                new Claim("UserId", user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, user.UserType.ToString())
-            });
+                new Claim(ClaimTypes.SerialNumber, validateResult.Value.Id.ToString()),
+                new Claim(ClaimTypes.Name, validateResult.Value.UserName),
+                new Claim(ClaimTypes.Role, validateResult.Value.UserType.ToString())
+            }, validateResult.Value.SecurityKey);
 
             return Result.Success(jwt);
         }
 
+        private Result<User> ValidateLogin(string username, string password)
+        {
+            var user = unitOfWork.UserRepository.Get(filter: u => u.UserName == username);
+
+            if (user == null)
+                return Result.Failure<User>($"Couldn't find a user with username: {username}");
+            else if (user.Blocked == true)
+                return Result.Failure<User>($"User is not allowed to login");
+            else if (user.HashedPassword != jWTService.ComputeHash(password, user.Salt))
+                return Result.Failure<User>($"{password} is the incorrect password");
+
+            return Result.Success(user);
+        }
+
         public Result Register(string username, string password, UserType userType)
         {
+            var validateResult = ValidateRegistration(username, password);
+            if (validateResult.IsFailure)
+            {
+                return Result.Failure(validateResult.Error);
+            }
+
             var salt = jWTService.GenerateSalt();
 
-            unitOfWork.UserRepository.Create(new User
+            var user = new User
             {
                 Blocked = false,
                 UserType = userType,
                 Salt = salt,
                 HashedPassword = jWTService.ComputeHash(password, salt),
-                SecurityKey = new Guid().ToString(),
+                SecurityKey = Guid.NewGuid().ToString(),
                 UserName = username
-            });
+            };
+
+            unitOfWork.UserRepository.Create(user);
 
             if (unitOfWork.SaveChanges(1) == false)
             {
@@ -149,6 +168,33 @@ namespace SecretsSecurityAssignment.Service
                 }
                 return Result.Failure("Couldn't save data for users:\n" + errorUsers);
             }
+
+            return Result.Success();
+        }
+
+        private Result ValidateRegistration(string username, string password)
+        {
+            var errorMessages = new List<string>();
+            if (username == null)
+            {
+                errorMessages.Add("Please enter a username");
+            }
+            else if (password == null)
+            {
+                errorMessages.Add("Please enter a password");
+                return Result.Failure(string.Join("\n", errorMessages));
+            }
+            else if (password.Length < 8)
+            {
+                errorMessages.Add("Password must be 8 characters long");
+            }
+            else if (!password.Any(char.IsDigit))
+            {
+                errorMessages.Add("Password must contain atleast one number");
+                return Result.Failure(string.Join("\n", errorMessages));
+            }
+            else if (unitOfWork.UserRepository.Get(filter: u => u.UserName == username) != null)
+                return Result.Failure($"User with username: {username} already excists");
 
             return Result.Success();
         }

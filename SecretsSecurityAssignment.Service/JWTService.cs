@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using SecretsSecurityAssignment.Core.Data.Service;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,12 +21,9 @@ namespace SecretsSecurityAssignment.Service
             return Convert.ToBase64String(byteResult.GetBytes(24));
         }
 
-        public string GenerateJWT(List<Claim> claims)
+        public string GenerateJWT(List<Claim> claims, string userSecurityKey)
         {
-            //TODO: Get userId value
-            //var userId = claims.UserId ??
-
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Pak hier de value van securitykey in userid"));
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(userSecurityKey));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

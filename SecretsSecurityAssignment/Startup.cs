@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using SecretsSecurityAssignment.Data;
+using SecretsSecurityAssignment.Service.Middleware;
 using SecretsSecurityAssignment.WebApi.ServiceCollectionExtentions;
 using System;
 using System.Collections.Generic;
@@ -53,12 +54,12 @@ namespace SecretsSecurityAssignment
 
             app.UseHttpsRedirection();
 
-            //TODO: Maak eigen routing om secrettype te vinden en aan de hand daarvan door te sturen naar goeie controller ??
+            //TODO: ?? Maak eigen routing om secrettype te vinden en aan de hand daarvan door te sturen naar goeie controller
             app.UseRouting();
 
-            //TODO: Maak Middleware
-            //TODO: Check voor securityKey per sessie ipv per user (per sessie)
-            app.UseAuthorization();
+            //TODO: ?? EXTRA: Check voor securityKey per sessie ipv per user (per sessie) 
+            //app.UseAuthorization();
+            app.UseMiddleware<JWTMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

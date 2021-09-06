@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SecretsSecurityAssignment.Core.UserEntities;
 using SecretsSecurityAssignment.Service;
+using SecretsSecurityAssignment.WebApi.ViewModels;
+using System;
 
 namespace SecretsSecurityAssignment.WebApi.Controllers
 {
@@ -12,8 +13,6 @@ namespace SecretsSecurityAssignment.WebApi.Controllers
 
         //TODO: Maak UserController
 
-        //TODO: Per type secret een controller??
-
         public UserController(IUserService userService)
         {
             this.userService = userService;
@@ -21,16 +20,47 @@ namespace SecretsSecurityAssignment.WebApi.Controllers
 
         [HttpPost]
         [Route("Login")]
-        public IActionResult Login(string username, string password)
+        public IActionResult Login(LoginCredentials loginCredentials)
         {
-            return Ok();
+            try
+            {
+                return Ok(new
+                {
+                    token = userService.Login(loginCredentials.Username, loginCredentials.Password).Value
+                });
+            }
+            catch(UnauthorizedAccessException uaaex)
+            {
+                return Problem($"Incorrect: {uaaex.Message}", statusCode: 401);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
         [Route("Create")]
-        public IActionResult CreateUser(string username, string password, UserType userType)
+        public IActionResult CreateUser(CreateCredentials createCredentials)
         {
-            return Ok();
+            //TODO: ?? Captcha toevoegen 
+            //TODO: ?? Niet teveel requests per ip address ~ tip: return StatusCode(429);
+
+            try
+            {
+                var result = userService.Register(createCredentials.Username, createCredentials.Password, createCredentials.UserType);
+
+                if (result.IsFailure)
+                {
+                    return Conflict(result.Error);
+                }
+
+                return Ok("User creation is: " + result.IsSuccess);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
