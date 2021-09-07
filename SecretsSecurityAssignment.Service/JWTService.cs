@@ -66,7 +66,7 @@ namespace SecretsSecurityAssignment.Service
 
             var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
 
-            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == "certserialnumber").Value);
             var userSecurityKey = unitOfWork.UserRepository.GetById(userId).SecurityKey;
 
             return userSecurityKey;
@@ -78,7 +78,7 @@ namespace SecretsSecurityAssignment.Service
 
             var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
 
-            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == "certserialnumber").Value);
 
             return userId;
         }
@@ -89,7 +89,7 @@ namespace SecretsSecurityAssignment.Service
 
             var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
 
-            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == "certserialnumber").Value);
 
             return userId;
         }
@@ -100,7 +100,7 @@ namespace SecretsSecurityAssignment.Service
 
             var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
 
-            var userRole = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role).Value;
+            var userRole = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "role").Value;
 
             return userRole;
         }
@@ -109,7 +109,7 @@ namespace SecretsSecurityAssignment.Service
         {
             var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
 
-            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == ClaimTypes.SerialNumber).Value);
+            var userId = Int32.Parse(jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == "certserialnumber").Value);
             var userSecurityKey = unitOfWork.UserRepository.GetById(userId).SecurityKey;
             var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(userSecurityKey));
 

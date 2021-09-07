@@ -41,6 +41,10 @@ namespace SecretsSecurityAssignment.Service.CustomAttributes
             var userRole = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "role").Value;
             switch (userType)
             {
+                case UserType.Civilian:
+                    {
+                        return;
+                    }
                 case UserType.GovermentEmployee:
                     if (userRole == UserType.Civilian.ToString())
                     {
