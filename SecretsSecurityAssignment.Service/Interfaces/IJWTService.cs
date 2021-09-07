@@ -14,6 +14,7 @@ namespace SecretsSecurityAssignment.Service
         public int GetUserIdFromTokenInHttpContext();
         public int GetUserIdFromTokenInHttpContext(HttpContext context);
         public string GetSecurityKeyFromTokenInHttpContext();
+        public string GetUserTypeFromTokenInHttpContext();
         public string GetUserTypeFromTokenInHttpContext(HttpContext context);
         public SymmetricSecurityKey CreateSymmetricSecurityKey(string token);
     }

@@ -41,9 +41,18 @@ namespace SecretsSecurityAssignment.Service.Middleware
         {
             try
             {
-                var securityKey = jWTService.CreateSymmetricSecurityKey(token);
-
                 var tokenHandler = new JwtSecurityTokenHandler();
+
+                //var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+                //var stringUserId = jwtSecurityToken.Claims.FirstOrDefault(a => a.Type == "certserialnumber").Value;
+                //var userId = Convert.ToInt32(stringUserId);
+
+                //if (unitOfWork.UserRepository.GetById(userId).Blocked == true)
+                //{
+                //    return;
+                //}
+
+                var securityKey = jWTService.CreateSymmetricSecurityKey(token);
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,

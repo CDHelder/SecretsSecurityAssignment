@@ -7,5 +7,6 @@ namespace SecretsSecurityAssignment.Core
         public int Id { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }
+        public bool IncludeUserName { get; set; }
     }
 }

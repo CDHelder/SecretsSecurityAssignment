@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using SecretsSecurityAssignment.Core.Data.Service;
 using SecretsSecurityAssignment.Core.UserEntities;
+using SecretsSecurityAssignment.Service.CustomAttributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace SecretsSecurityAssignment.Service
             this.jWTService = jWTService;
         }
 
+        [AuthorizeUser(UserType.Admin)]
         public Result Block(int userId)
         {
             var user = unitOfWork.UserRepository.GetById(userId);
@@ -39,6 +41,7 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success();
         }
 
+        [AuthorizeUser(UserType.Admin)]
         public Result Block(int[] userIds)
         {
             var users = unitOfWork.UserRepository.GetById(userIds);
@@ -90,7 +93,7 @@ namespace SecretsSecurityAssignment.Service
             if (user == null)
                 return Result.Failure<User>($"Couldn't find a user with username: {username}");
             else if (user.Blocked == true)
-                return Result.Failure<User>($"User is not allowed to login");
+                return Result.Failure<User>($"User is banned");
             else if (user.HashedPassword != jWTService.ComputeHash(password, user.Salt))
                 return Result.Failure<User>($"{password} is the incorrect password");
 
@@ -99,7 +102,7 @@ namespace SecretsSecurityAssignment.Service
 
         public Result Register(string username, string password, UserType userType)
         {
-            var validateResult = ValidateRegistration(username, password);
+            var validateResult = ValidateRegistration(username, password, userType);
             if (validateResult.IsFailure)
             {
                 return Result.Failure(validateResult.Error);
@@ -128,6 +131,7 @@ namespace SecretsSecurityAssignment.Service
 
         }
 
+        [AuthorizeUser(UserType.Admin)]
         public Result Unblock(int userId)
         {
             var user = unitOfWork.UserRepository.GetById(userId);
@@ -146,6 +150,7 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success();
         }
 
+        [AuthorizeUser(UserType.Admin)]
         public Result Unblock(int[] userIds)
         {
             var users = unitOfWork.UserRepository.GetById(userIds);
@@ -172,10 +177,15 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success();
         }
 
-        private Result ValidateRegistration(string username, string password)
+        private Result ValidateRegistration(string username, string password, UserType userType)
         {
             var errorMessages = new List<string>();
-            if (username == null)
+            if (userType == UserType.Admin)
+            {
+                errorMessages.Add("401: Unauthorized");
+                return Result.Failure(string.Join("\n", errorMessages));
+            }
+            else if (username == null)
             {
                 errorMessages.Add("Please enter a username");
             }
@@ -199,6 +209,7 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success();
         }
 
+        [AuthorizeUser(UserType.Admin)]
         public Result Block(string username)
         {
             var user = unitOfWork.UserRepository.Get(filter: u => u.UserName == username);
@@ -217,6 +228,7 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success();
         }
 
+        [AuthorizeUser(UserType.Admin)]
         public Result Unblock(string username)
         {
             var user = unitOfWork.UserRepository.Get(filter: u => u.UserName == username);

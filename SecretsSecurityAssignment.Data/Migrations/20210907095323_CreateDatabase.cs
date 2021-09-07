@@ -13,10 +13,10 @@ namespace SecretsSecurityAssignment.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserType = table.Column<int>(type: "int", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HashedPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Salt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SecurityKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HashedPassword = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Salt = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Blocked = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -31,7 +31,9 @@ namespace SecretsSecurityAssignment.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IncludeUserName = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -51,7 +53,9 @@ namespace SecretsSecurityAssignment.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IncludeUserName = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,7 +75,9 @@ namespace SecretsSecurityAssignment.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IncludeUserName = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,29 +92,29 @@ namespace SecretsSecurityAssignment.Data.Migrations
 
             migrationBuilder.InsertData(
                 table: "SensitiveSecrets",
-                columns: new[] { "Id", "Content", "UserId" },
+                columns: new[] { "Id", "Content", "IncludeUserName", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { 1, "SensitiveSecret 1", null },
-                    { 2, "SensitiveSecret 2", null }
+                    { 1, "SensitiveSecret 1", true, "Roddel 1", null },
+                    { 2, "SensitiveSecret 2", false, "Roddel 2", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "StateSecrets",
-                columns: new[] { "Id", "Content", "UserId" },
+                columns: new[] { "Id", "Content", "IncludeUserName", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { 3, "StateSecret 1", null },
-                    { 4, "StateSecret 2", null }
+                    { 1, "StateSecret 1", false, "Staatsgeheim 1", null },
+                    { 2, "StateSecret 2", false, "Staatsgeheim 2", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "TopSecrets",
-                columns: new[] { "Id", "Content", "UserId" },
+                columns: new[] { "Id", "Content", "IncludeUserName", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { 5, "TopSecret 1", null },
-                    { 6, "TopSecret 2", null }
+                    { 1, "TopSecret 1", false, "Topgeheim 1", null },
+                    { 2, "TopSecret 2", false, "Topgeheim 2", null }
                 });
 
             migrationBuilder.CreateIndex(

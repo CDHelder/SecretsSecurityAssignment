@@ -10,8 +10,8 @@ using SecretsSecurityAssignment.Data;
 namespace SecretsSecurityAssignment.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210903120908_AddNameToSecret")]
-    partial class AddNameToSecret
+    [Migration("20210907095323_CreateDatabase")]
+    partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -31,6 +31,9 @@ namespace SecretsSecurityAssignment.Data.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IncludeUserName")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -48,12 +51,14 @@ namespace SecretsSecurityAssignment.Data.Migrations
                         {
                             Id = 1,
                             Content = "SensitiveSecret 1",
+                            IncludeUserName = true,
                             Name = "Roddel 1"
                         },
                         new
                         {
                             Id = 2,
                             Content = "SensitiveSecret 2",
+                            IncludeUserName = false,
                             Name = "Roddel 2"
                         });
                 });
@@ -67,6 +72,9 @@ namespace SecretsSecurityAssignment.Data.Migrations
 
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IncludeUserName")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -85,12 +93,14 @@ namespace SecretsSecurityAssignment.Data.Migrations
                         {
                             Id = 1,
                             Content = "StateSecret 1",
+                            IncludeUserName = false,
                             Name = "Staatsgeheim 1"
                         },
                         new
                         {
                             Id = 2,
                             Content = "StateSecret 2",
+                            IncludeUserName = false,
                             Name = "Staatsgeheim 2"
                         });
                 });
@@ -104,6 +114,9 @@ namespace SecretsSecurityAssignment.Data.Migrations
 
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IncludeUserName")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -122,12 +135,14 @@ namespace SecretsSecurityAssignment.Data.Migrations
                         {
                             Id = 1,
                             Content = "TopSecret 1",
+                            IncludeUserName = false,
                             Name = "Topgeheim 1"
                         },
                         new
                         {
                             Id = 2,
                             Content = "TopSecret 2",
+                            IncludeUserName = false,
                             Name = "Topgeheim 2"
                         });
                 });

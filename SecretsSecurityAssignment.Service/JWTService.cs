@@ -115,5 +115,16 @@ namespace SecretsSecurityAssignment.Service
 
             return securityKey;
         }
+
+        public string GetUserTypeFromTokenInHttpContext()
+        {
+            var token = httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            var jwtSecurityToken = tokenHandler.ReadJwtToken(token);
+
+            var userRole = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "role").Value;
+
+            return userRole;
+        }
     }
 }

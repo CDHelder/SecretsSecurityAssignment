@@ -59,6 +59,13 @@ namespace SecretsSecurityAssignment.Service.CustomAttributes
                         return;
                     }
                     break;
+                case UserType.Admin:
+                    if (userRole == UserType.Civilian.ToString() || userRole == UserType.GovermentEmployee.ToString() || userRole == UserType.SecretAgent.ToString())
+                    {
+                        context.Result = new JsonResult(string.Empty) { StatusCode = StatusCodes.Status401Unauthorized };
+                        return;
+                    }
+                    break;
                 default:
                     context.Result = new JsonResult(string.Empty) { StatusCode = StatusCodes.Status401Unauthorized };
                     return;

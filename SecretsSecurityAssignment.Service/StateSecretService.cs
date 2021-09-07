@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using SecretsSecurityAssignment.Core;
 using SecretsSecurityAssignment.Core.Data.Service;
+using SecretsSecurityAssignment.Core.UserEntities;
+using SecretsSecurityAssignment.Service.CustomAttributes;
 using SecretsSecurityAssignment.Service.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,9 +23,18 @@ namespace SecretsSecurityAssignment.Service
             this.jWTService = jWTService;
         }
 
+        [AuthorizeUser(UserType.GovermentEmployee)]
         public Result Create(string content, string name)
         {
+            if (string.IsNullOrWhiteSpace(content) || string.IsNullOrWhiteSpace(name))
+                Result.Failure("Please enter a name and content");
+
             var userId = jWTService.GetUserIdFromTokenInHttpContext();
+
+            if (unitOfWork.UserRepository.GetById(userId).Blocked == true)
+            {
+                return Result.Failure("User is banned");
+            }
 
             StateSecret stateSecret = new StateSecret
             {
@@ -40,6 +51,7 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success();
         }
 
+        [AuthorizeUser(UserType.Admin)]
         public Result Delete(int stateSecretId)
         {
             var stateSecret = Get(stateSecretId).Value;
@@ -55,8 +67,16 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success();
         }
 
+        [AuthorizeUser(UserType.GovermentEmployee)]
         public Result<List<StateSecret>> GetAll()
         {
+            var userId = jWTService.GetUserIdFromTokenInHttpContext();
+
+            if (unitOfWork.UserRepository.GetById(userId).Blocked == true)
+            {
+                return Result.Failure<List<StateSecret>>("User is banned");
+            }
+
             var stateSecrets =  unitOfWork.StateSecretRepository.GetAll();
 
             if (stateSecrets == null)
@@ -65,8 +85,16 @@ namespace SecretsSecurityAssignment.Service
             return Result.Success(stateSecrets);
         }
 
+        [AuthorizeUser(UserType.GovermentEmployee)]
         public Result<StateSecret> Get(int id)
         {
+            var userId = jWTService.GetUserIdFromTokenInHttpContext();
+
+            if (unitOfWork.UserRepository.GetById(userId).Blocked == true)
+            {
+                return Result.Failure<StateSecret>("User is banned");
+            }
+
             var stateSecret = unitOfWork.StateSecretRepository.GetById(id);
 
             if (stateSecret == null)
@@ -77,6 +105,21 @@ namespace SecretsSecurityAssignment.Service
 
         public Result Update(StateSecret secret)
         {
+            var userId = jWTService.GetUserIdFromTokenInHttpContext();
+
+            if (unitOfWork.UserRepository.GetById(userId).Blocked == true)
+            {
+                return Result.Failure("User is banned");
+            }
+
+            if (jWTService.GetUserTypeFromTokenInHttpContext() != UserType.Admin.ToString())
+            {
+                if (unitOfWork.SensitiveSecretRepository.Get(filter: a => a.Id == secret.Id).UserId != userId)
+                {
+                    return Result.Failure("Secrets can only be changed by the original creator");
+                }
+            }
+
             unitOfWork.StateSecretRepository.Update(secret);
 
             if (unitOfWork.SaveChanges(1) == false)

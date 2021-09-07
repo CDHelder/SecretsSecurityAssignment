@@ -10,7 +10,8 @@ namespace SecretsSecurityAssignment.Core.UserEntities
     {
         Civilian,
         GovermentEmployee,
-        SecretAgent
+        SecretAgent,
+        Admin
     }
 
     public class User
