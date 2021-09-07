@@ -4,16 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 using SecretsSecurityAssignment.Core;
 using SecretsSecurityAssignment.Service;
 using SecretsSecurityAssignment.Service.Interfaces;
+using SecretsSecurityAssignment.Service.CustomAttributes;
 using SecretsSecurityAssignment.WebApi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SecretsSecurityAssignment.Core.UserEntities;
 
 namespace SecretsSecurityAssignment.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AuthorizeUser(UserType.SecretAgent)]
     public class TopSecretController : ControllerBase
     {
         private readonly ITopSecretService service;

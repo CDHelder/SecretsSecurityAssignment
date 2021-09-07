@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SecretsSecurityAssignment.Core;
+using SecretsSecurityAssignment.Core.UserEntities;
 using SecretsSecurityAssignment.Service;
+using SecretsSecurityAssignment.Service.CustomAttributes;
 using SecretsSecurityAssignment.Service.Interfaces;
 using SecretsSecurityAssignment.WebApi.ViewModels;
 using System;
@@ -14,6 +16,7 @@ namespace SecretsSecurityAssignment.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AuthorizeUser(UserType.GovermentEmployee)]
     public class StateSecretController : ControllerBase
     {
         private readonly IStateSecretService service;

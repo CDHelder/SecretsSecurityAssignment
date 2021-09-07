@@ -16,7 +16,7 @@ namespace SecretsSecurityAssignment.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AuthorizeUser(UserType = UserType.SecretAgent)]
+    [AuthorizeUser(UserType.Civilian)]
     public class SensitiveSecretController : ControllerBase
     {
         private readonly ISensitiveSecretService service;
